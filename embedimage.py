@@ -18,11 +18,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # pylint: disable=ungrouped-imports
+"""
+Embed images so they are base64 encoded data inside the svg.
+"""
+
+from __future__ import unicode_literals
+
+import os
+
+import inkex
+from inkex import Image
+from inkex.localization import inkex_gettext as _
+
 
 # ログ取得用.
-from lxml import etree
-import re
+import logging
 import pprint
+import sys
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -32,7 +44,7 @@ formatter = logging.Formatter('%(levelname)s - %(lineno)d - %(message)s')
 if False:
     #a logger for debugging/warnings
     logger.setLevel( logging.DEBUG )
-    fh = logging.FileHandler(filename='/home/yfujita/work/bin/python/inkscape/platealign/platealign.log', mode='a')
+    fh = logging.FileHandler(filename='/home/yfujita/work/bin/python/inkscape/embedimages/embedimage.log', mode='a')
     fh.setLevel( logging.DEBUG )
     fh.setFormatter(formatter)
 else:
@@ -42,22 +54,8 @@ else:
 
 logger.addHandler( fh )
 logger.debug( "\n\nLogger initialized" )
+# logger ここまで
 
-
-"""
-Embed images so they are base64 encoded data inside the svg.
-"""
-
-
-
-
-from __future__ import unicode_literals
-
-import os
-
-import inkex
-from inkex import Image
-from inkex.localization import inkex_gettext as _
 
 try:
     import urllib.request as urllib
@@ -88,6 +86,8 @@ class EmbedImage(inkex.EffectExtension):
     def embed_image(self, node):
         """Embed the data of the selected Image Tag element"""
         xlink = node.get('xlink:href')
+        # logger.debug("xlink=" + str(xlink))
+        # logger.debug("type(xlink)=" + str(type(xlink)))
         if (xlink is not None and xlink[:5] == 'data:'):
             # No need, data already embedded
             return
@@ -98,8 +98,15 @@ class EmbedImage(inkex.EffectExtension):
         url = urlparse.urlparse(xlink)
         href = urllib.url2pathname(url.path)
 
+        # logger.debug("url=" + str(type(url)))
+        # logger.debug("href=" + href)
+
         # Primary location always the filename itself.
         path = self.absolute_href(href or '')
+
+        # logger.debug("path=" + path)
+        # basename = os.path.basename(path)
+        # logger.debug("basename=" + basename)
 
         # Backup directory where we can find the image
         if not os.path.isfile(path):
@@ -119,6 +126,7 @@ class EmbedImage(inkex.EffectExtension):
                 node.set('xlink:href', 'data:{};base64,{}'.format(
                     file_type, encodebytes(handle.read()).decode('ascii')))
                 node.pop('sodipodi:absref')
+                node.set('inkscape:label', path)
             else:
                 inkex.errormsg(_("%s is not of type image/png, image/jpeg, "\
                     "image/bmp, image/gif, image/tiff, or image/x-icon") % path)
