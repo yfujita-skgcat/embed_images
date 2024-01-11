@@ -3,6 +3,9 @@ Inkscape extension for embedding images with adding original file name to object
 
 リンク画像を埋め込む際に、元のファイル名をオブジェクトのラベル("inkscape:label"プロパティ)に保存する。
 
+inkscape ver 1.3 (または、extensions ディレクトリに image_embed.py がある)場合は
+embedimage.py の代わりに image_embed.py をコピーしてください。
+
 ## install
 
 embedimage.py ファイルをinkscapeのextensionフォルダにコピーしてください。
@@ -40,6 +43,9 @@ embedimage.py
 **オリジナルのextensionを削除したくない場合は、ユーザーのextensionフォルダにインストールしてください。**
 Windows での動作は検証していません。
 
+
+> [!NOTE]
+> オリジナルのembedimage.py, embedimage.inx (またはimage_embed.py, image_embed.inx)を削除したくない場合は事前にコピーをとっておく.
 
 ## 使い方
 
